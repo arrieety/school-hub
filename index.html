@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#a78bfa">
+<title>School Hub ♡</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+:root{--bg:#f8f5ff;--panel:#fff;--ink:#403653;--muted:#9286a7;--purple:#a78bfa;--pink:#f7b8d0;--line:#eee7fa}
+*{box-sizing:border-box}
+body{margin:0;font-family:Nunito,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer;border:0}
+.shell{display:grid;grid-template-columns:245px 1fr;min-height:100vh;max-width:1600px;margin:auto}
+.sidebar{background:#f0eaff;padding:22px 15px;display:flex;flex-direction:column;gap:14px}
+.brand{text-align:center;padding:8px 10px 18px}
+.brand .cat{font-size:42px}
+.brand h1{color:#765bc2;margin:5px 0;font-size:25px}
+.brand p{font-size:12px;color:#9988bd;margin:0}
+.nav{display:grid;gap:6px}
+.nav button{background:transparent;text-align:left;padding:12px;border-radius:13px;color:#77698e;font-weight:800}
+.nav button.active,.nav button:hover{background:white;color:#765bc2}
+.sidebar-note{margin-top:auto;background:white;border-radius:16px;padding:15px;text-align:center;color:#8c79b0;font-size:13px}
+.sidebar-note b{display:block;color:#8067bf}
+main{padding:25px;min-width:0}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px}
+.topbar h2{margin:0;font-size:22px}
+.topbar p{margin:2px 0;color:var(--muted);font-size:13px}
+.top-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+select,.icon-btn,.small-btn{background:white;border:1px solid var(--line);border-radius:12px;padding:9px 12px;color:var(--ink);font-weight:800}
+.icon-btn{width:40px;height:40px;font-size:18px}
+.mobile-menu{display:none}
+.hero{background:linear-gradient(115deg,#d9caff,#f4d8e8);border-radius:22px;padding:25px;margin-bottom:18px;position:relative;overflow:hidden}
+.hero h2{margin:0 0 5px;color:#654da4;font-size:25px}
+.hero p{margin:0;color:#79659d}
+.hero .cat{position:absolute;right:25px;bottom:-10px;font-size:70px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.stat,.card{background:var(--panel);border:1px solid var(--line);border-radius:19px;padding:17px}
+.stat{background:#faf7ff}
+.stat strong{display:block;font-size:23px;color:#8268c5}
+.stat span{font-size:12px;color:var(--muted);font-weight:700}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.card h3{font-size:16px;margin:0 0 12px}
+.card-head,.page-title{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}
+.page-title h2{font-size:22px;margin:0}
+.page{display:none}
+.page.active{display:block}
+.btn{background:#9476e4;color:white;padding:10px 14px;border-radius:11px;font-weight:900}
+.btn.soft{background:#f1ebff;color:#8067bf}
+.btn.danger{background:#ffeaf0;color:#c56f91}
+.btn.small{padding:6px 9px;font-size:12px}
+.list{display:grid;gap:8px}
+.list-item{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#fcfaff;border:1px solid #f0eafa;border-radius:12px;padding:10px}
+.list-item b{font-size:13px}
+.list-item small{display:block;color:var(--muted);font-size:11px}
+.tag{font-size:11px;font-weight:900;border-radius:20px;padding:6px 9px;background:#f0eaff;color:#8066c3}
+.tag.done{background:#e4f7ee;color:#559c7c}
+.empty{text-align:center;color:var(--muted);padding:20px;font-size:13px}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field{display:grid;gap:5px}
+.field label{font-size:12px;font-weight:900;color:#827399}
+.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);background:#fdfbff;border-radius:10px;padding:10px;color:var(--ink)}
+.form-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.table-wrap{overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line)}
+th{font-size:11px;color:#9688aa}
+.tabs{display:flex;gap:7px;margin-bottom:13px;flex-wrap:wrap}
+.tabs button{padding:8px 12px;border-radius:20px;background:#f5f1fb;color:#8d7fa2;font-size:12px;font-weight:900}
+.tabs button.active{background:#a78bfa;color:white}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.calendar-grid span{padding:8px 2px;font-size:12px;border-radius:9px}
+.calendar-grid .dow{color:#a194b4;font-weight:900}
+.calendar-grid .day{cursor:pointer}
+.calendar-grid .day:hover{background:#f4efff}
+.calendar-grid .today{background:#a78bfa;color:white;font-weight:900}
+.calendar-grid .selected{outline:2px solid #e7a9ca}
+.calendar-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.event{padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#4b3e60;color:white;padding:11px 17px;border-radius:12px;opacity:0;transition:.2s;pointer-events:none}
+.toast.show{opacity:1}
+#menuOverlay{display:none}
+.dark{--bg:#211c2b;--panel:#2d263a;--ink:#f3edf9;--muted:#b5a8c7;--line:#453953}
+.dark .sidebar{background:#2a2238}
+.dark .nav button{color:#c7b9dc}
+.dark .nav button.active,.dark .nav button:hover,.dark select,.dark .icon-btn,.dark .small-btn{background:#382e49;color:var(--ink)}
+.dark .stat,.dark .list-item,.dark .field input,.dark .field select,.dark .field textarea{background:#352c45;color:var(--ink)}
+@media(max-width:900px){
+.shell{grid-template-columns:1fr}
+.sidebar{position:fixed;z-index:1001;left:0;top:0;bottom:0;width:260px;max-width:85vw;overflow-y:auto;transform:translateX(-110%);transition:transform .25s}
+.sidebar.open{transform:translateX(0)}
+.mobile-menu{display:inline-grid;place-items:center}
+#menuOverlay.show{display:block;position:fixed;inset:0;background:#23193070;z-index:1000}
+.grid{grid-template-columns:1fr}
+main{padding:16px}
+}
+@media(max-width:560px){
+main{padding:12px}
+.topbar{flex-wrap:wrap}
+.top-actions{width:100%}
+.hero h2{font-size:20px;max-width:75%}
+.hero .cat{font-size:55px;right:8px}
+.stats{gap:6px}
+.stat{padding:10px}
+.stat strong{font-size:19px}
+.field-grid{grid-template-columns:1fr}
+.page-title h2{font-size:19px}
+}
+</style>
+</head>
+<body>
+<div id="menuOverlay"></div>
+<div class="shell">
+<aside class="sidebar" id="sidebar">
+<div class="brand"><div class="cat">🐱</div><h1>School Hub ♡</h1><p>Plan • Track • Achieve</p></div>
+<nav class="nav" id="nav">
+<button class="active" data-page="dashboard">⌂ Dashboard</button>
+<button data-page="profile">♡ Student Information</button>
+<button data-page="attendance">☑ Attendance</button>
+<button data-page="assignments">✎ Assignments</button>
+<button data-page="modules">▦ Modules Tracker</button>
+<button data-page="calendar">▣ Calendar</button>
+<button data-page="subjects">✿ Subjects & Teachers</button>
+<button data-page="grades">★ Grades</button>
+<button data-page="schedule">◷ Class Schedule</button>
+<button data-page="settings">⚙ Settings & Backup</button>
+</nav>
+<div class="sidebar-note"><b>You're doing great! ♡</b>One task at a time. Keep going!<div>🌷 📚</div></div>
+</aside>
+
+<main>
+<header class="topbar">
+<div style="display:flex;gap:10px;align-items:center">
+<button class="icon-btn mobile-menu" id="menuBtn">☰</button>
+<div><h2 id="greeting">Hello, Student! ♡</h2><p>Stay organized, stay ahead!</p></div>
+</div>
+<div class="top-actions">
+<select id="strandSelect"><option value="STEM">🧪 STEM</option><option value="ABM">💼 ABM</option></select>
+<select id="schoolYear"><option>2026–2027</option><option>2025–2026</option><option>2027–2028</option></select>
+<button class="icon-btn" id="themeBtn">☾</button>
+</div>
+</header>
+
+<section class="page active" id="page-dashboard">
+<div class="hero"><h2>Dream big, study hard,<br>make it happen! ♡</h2><p>Your little space to stay on top of school.</p><div class="cat">🐈</div></div>
+<div class="stats">
+<div class="stat"><strong id="statSubjects">0</strong><span>My subjects</span></div>
+<div class="stat"><strong id="statTasks">0</strong><span>Active assignments</span></div>
+<div class="stat"><strong id="statModules">0%</strong><span>Modules completed</span></div>
+</div>
+<div class="grid">
+<div class="card"><h3>♡ Attendance Overview</h3><div id="dashAttendance"></div><p><b id="dashPercent">0%</b> overall attendance</p></div>
+<div class="card"><h3>▣ Calendar</h3><div class="calendar-top"><button class="small-btn" id="dashPrev">‹</button><b id="dashMonth"></b><button class="small-btn" id="dashNext">›</button></div><div class="calendar-grid" id="dashCalendar"></div><p id="dashEvents" class="muted">Nothing scheduled today ♡</p></div>
+<div class="card"><h3>✎ Upcoming Assignments</h3><div class="list" id="dashAssignments"></div></div>
+<div class="card"><h3>▦ Modules Progress</h3><div id="dashModules"></div></div>
+</div>
+</section>
+
+<section class="page" id="page-profile">
+<div class="page-title"><h2>♡ Student Information</h2></div>
+<div class="card"><div class="field-grid" id="profileFields"></div><div class="form-actions"><button class="btn" id="saveProfile">Save information</button></div></div>
+</section>
+
+<section class="page" id="page-attendance">
+<div class="page-title"><h2>☑ Attendance Tracker</h2></div>
+<div class="card">
+<div class="field-grid">
+<div class="field"><label>Subject</label><select id="attSubject"></select></div>
+<div class="field"><label>Date</label><input type="date" id="attDate"></div>
+<div class="field"><label>Status</label><select id="attStatus"><option>Present</option><option>Absent</option><option>Late</option><option>Excused</option></select></div>
+</div>
+<div class="form-actions"><button class="btn" id="saveAttendance">Save attendance</button><span id="attRate" class="tag">0% present</span></div>
+<div class="table-wrap"><table><thead><tr><th>Date</th><th>Subject</th><th>Status</th><th>Action</th></tr></thead><tbody id="attendanceRows"></tbody></table></div>
+</div>
+</section>
+
+<section class="page" id="page-assignments">
+<div class="page-title"><h2>✎ Assignments</h2><button class="btn" id="addAssignment">＋ Add assignment</button></div>
+<div class="card"><div class="tabs" id="assignmentTabs"><button class="active" data-filter="All">All</button><button data-filter="Upcoming">Upcoming</button><button data-filter="Completed">Completed</button></div><div class="list" id="assignmentList"></div></div>
+</section>
+
+<section class="page" id="page-modules">
+<div class="page-title"><h2>▦ Modules Tracker</h2><button class="btn" id="addModule">＋ Add module</button></div>
+<div class="card"><h3 id="moduleProgress">0 / 0</h3><div style="height:10px;background:#eee8f8;border-radius:20px;margin-bottom:15px"><div id="moduleFill" style="height:100%;width:0;background:#a78bfa;border-radius:20px"></div></div><div class="list" id="moduleList"></div></div>
+</section>
+
+<section class="page" id="page-calendar">
+<div class="page-title"><h2>▣ Calendar & Events</h2><button class="btn" id="addEvent">＋ Add event</button></div>
+<div class="card"><div class="calendar-top"><button class="small-btn" id="calPrev">‹ Previous</button><b id="fullMonth"></b><button class="small-btn" id="calNext">Next ›</button></div><div class="calendar-grid" id="fullCalendar"></div><h3 id="selectedDateLabel" style="margin-top:20px">Events</h3><div id="selectedEvents"></div></div>
+</section>
+
+<section class="page" id="page-subjects">
+<div class="page-title"><h2>✿ Subjects & Teachers</h2><button class="btn" id="addSubject">＋ Add subject</button></div>
+<div class="card"><p class="muted">Edit subjects, teacher names, and room numbers for the selected strand.</p><div class="table-wrap"><table><thead><tr><th>Subject</th><th>Teacher</th><th>Room</th><th>Action</th></tr></thead><tbody id="subjectRows"></tbody></table></div></div>
+</section>
+
+<section class="page" id="page-grades">
+<div class="page-title"><h2>★ Grades Tracker</h2><button class="btn" id="addGrade">＋ Add grade</button></div>
+<div class="card"><div class="table-wrap"><table><thead><tr><th>Subject</th><th>Activity</th><th>Score</th><th>Total</th><th>Percent</th><th>Action</th></tr></thead><tbody id="gradeRows"></tbody></table></div><p>Average: <b id="gradeAverage">—</b></p></div>
+</section>
+
+<section class="page" id="page-schedule">
+<div class="page-title"><h2>◷ Class Schedule</h2><button class="btn" id="addSchedule">＋ Add class</button></div>
+<div class="card"><div class="table-wrap"><table><thead><tr><th>Day</th><th>Time</th><th>Subject</th><th>Room</th><th>Action</th></tr></thead><tbody id="scheduleRows"></tbody></table></div></div>
+</section>
+
+<section class="page" id="page-settings">
+<div class="page-title"><h2>⚙ Settings & Backup</h2></div>
+<div class="grid">
+<div class="card"><h3>App preferences</h3><div class="field"><label>School name</label><input id="schoolName" placeholder="PHINMA University of Iloilo"></div><div class="form-actions"><button class="btn" id="saveSettings">Save settings</button></div></div>
+<div class="card"><h3>Backup your data</h3><p class="muted">Download a backup before changing devices.</p><button class="btn" id="exportData">Download backup</button><br><br><label class="btn soft" for="importFile">Import backup</label><input id="importFile" type="file" accept="application/json" hidden><br><br><button class="btn danger" id="resetData">Reset all app data</button></div>
+</div>
+<div class="card" style="margin-top:15px"><h3>Phone use</h3><p class="muted">This page adjusts to phone screens. To install it as an app, it must be hosted on a secure HTTPS website first.</p></div>
+</section>
+</main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const DEFAULTS={
+STEM:["General Mathematics","Statistics and Probability","Earth and Life Science","Physical Science","Research","English","Filipino","Physical Education and Health","Empowerment Technologies"],
+ABM:["Applied Economics","Business Ethics and Social Responsibility","Fundamentals of Accountancy, Business and Management 1","Fundamentals of Accountancy, Business and Management 2","Business Math","Business Finance","Organization and Management","Principles of Marketing","English","Filipino","Research","Physical Education and Health"]
+};
+const $=id=>document.getElementById(id);
+const today=()=>{let d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+const makeId=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const fresh=()=>({
+profile:{name:"",number:"",section:"",room:"",adviser:"",schoolYear:"2026–2027",school:""},
+subjects:{STEM:DEFAULTS.STEM.map(name=>({name,teacher:"",room:""})),ABM:DEFAULTS.ABM.map(name=>({name,teacher:"",room:""}))},
+attendance:[],assignments:[],modules:[],events:[],grades:[],schedule:[],settings:{schoolName:""}
+});
+function loadData(){
+try{
+let old=JSON.parse(localStorage.getItem("schoolHubData")||"{}"),base=fresh();
+return {...base,...old,profile:{...base.profile,...old.profile},subjects:{...base.subjects,...old.subjects},settings:{...base.settings,...old.settings},attendance:old.attendance||[],assignments:old.assignments||[],modules:old.modules||[],events:old.events||[],grades:old.grades||[],schedule:old.schedule||[]};
+}catch(e){return fresh()}
+}
+let data=loadData(),strand="STEM",assignmentFilter="All",calDate=new Date(),selectedDate=today();
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function toast(msg){let t=$("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2200)}
+function subjects(){return data.subjects[strand]||[]}
+function save(){localStorage.setItem("schoolHubData",JSON.stringify(data));renderAll()}
+function go(page){
+document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+$("page-"+page).classList.add("active");
+document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
+closeMenu();
+if(page==="calendar")renderCalendar();
+if(page==="profile")renderProfile();
+}
+$("nav").onclick=e=>{let b=e.target.closest("button[data-page]");if(b)go(b.dataset.page)};
+document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));
+function closeMenu(){$("sidebar").classList.remove("open");$("menuOverlay").classList.remove("show")}
+$("menuBtn").onclick=()=>$("sidebar").classList.toggle("open")||$("menuOverlay").classList.toggle("show");
+$("menuBtn").addEventListener("click",()=>{$("menuOverlay").classList.toggle("show",$("sidebar").classList.contains("open"))});
+$("menuOverlay").onclick=closeMenu;
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeMenu()});
+window.addEventListener("resize",()=>{if(innerWidth>900)closeMenu()});
+$("strandSelect").onchange=e=>{strand=e.target.value;renderAll();toast("Switched to "+strand)};
+$("schoolYear").onchange=e=>{data.profile.schoolYear=e.target.value;save()};
+$("themeBtn").onclick=()=>{document.body.classList.toggle("dark");localStorage.setItem("schoolHubDark",document.body.classList.contains("dark"))};
+if(localStorage.getItem("schoolHubDark")==="true")document.body.classList.add("dark");
+
+function renderProfile(){
+let fields=[["name","Student name"],["number","Student number"],["section","Grade & section"],["room","Homeroom"],["adviser","Class adviser"],["schoolYear","School year"],["school","School name"]];
+$("profileFields").innerHTML=fields.map(([k,label])=>`<div class="field"><label>${label}</label><input id="p_${k}" value="${esc(data.profile[k]||"")}" placeholder="${label}"></div>`).join("");
+}
+$("saveProfile").onclick=()=>{
+["name","number","section","room","adviser","schoolYear","school"].forEach(k=>data.profile[k]=$("p_"+k).value);
+$("schoolYear").value=data.profile.schoolYear||"2026–2027";
+save();toast("Student information saved ♡");
+};
+
+function renderSubjects(){
+$("subjectRows").innerHTML=subjects().map((s,i)=>`<tr><td>${esc(s.name)}</td><td>${esc(s.teacher||"—")}</td><td>${esc(s.room||"—")}</td><td><button class="btn soft small" onclick="editSubject(${i})">Edit</button> <button class="btn danger small" onclick="deleteSubject(${i})">Delete</button></td></tr>`).join("")||'<tr><td colspan="4" class="empty">No subjects yet.</td></tr>';
+$("attSubject").innerHTML=subjects().map(s=>`<option>${esc(s.name)}</option>`).join("");
+}
+function addOrEditSubject(i=null){
+let old=i===null?{name:"",teacher:"",room:""}:subjects()[i];
+let name=prompt("Subject name:",old.name);if(name===null||!name.trim())return;
+let teacher=prompt("Teacher name:",old.teacher||"");if(teacher===null)return;
+let room=prompt("Room:",old.room||"");if(room===null)return;
+if(i===null)subjects().push({name:name.trim(),teacher,room});
+else subjects()[i]={name:name.trim(),teacher,room};
+save();toast("Subject saved ♡");
+}
+function editSubject(i){addOrEditSubject(i)}
+function deleteSubject(i){if(confirm("Delete this subject?")){subjects().splice(i,1);save()}}
+$("addSubject").onclick=()=>addOrEditSubject();
+
+function renderAttendance(){
+let records=data.attendance.filter(a=>a.strand===strand);
+let total=records.length,present=records.filter(a=>a.status==="Present"||a.status==="Late").length;
+$("attRate").textContent=(total?Math.round(present/total*100):0)+"% present";
+$("attendanceRows").innerHTML=records.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(a=>`<tr><td>${esc(a.date)}</td><td>${esc(a.subject)}</td><td>${esc(a.status)}</td><td><button class="btn danger small" onclick="deleteAttendance('${a.id}')">Delete</button></td></tr>`).join("")||'<tr><td colspan="4" class="empty">No attendance records yet.</td></tr>';
+}
+$("attDate").value=today();
+$("saveAttendance").onclick=()=>{
+let date=$("attDate").value,subject=$("attSubject").value;
+if(!date||!subject)return toast("Choose a date and subject");
+data.attendance.push({id:makeId(),strand,date,subject,status:$("attStatus").value});
+save();toast("Attendance saved ♡");
+};
+function deleteAttendance(id){data.attendance=data.attendance.filter(a=>a.id!==id);save()}
+
+function renderAssignments(){
+let list=data.assignments.filter(a=>a.strand===strand);
+if(assignmentFilter!=="All")list=list.filter(a=>assignmentFilter==="Completed"?a.done:!a.done);
+$("assignmentList").innerHTML=list.sort((a,b)=>(a.due||"").localeCompare(b.due||"")).map(a=>`<div class="list-item"><div><b>${esc(a.title)}</b><small>${esc(a.subject)} · Due ${esc(a.due||"No date")}</small></div><div><button class="tag ${a.done?"done":""}" onclick="toggleAssignment('${a.id}')">${a.done?"Completed":"Mark done"}</button> <button class="btn danger small" onclick="deleteAssignment('${a.id}')">×</button></div></div>`).join("")||'<div class="empty">No assignments in this view ♡</div>';
+}
+$("assignmentTabs").onclick=e=>{
+let b=e.target.closest("button[data-filter]");if(!b)return;
+assignmentFilter=b.dataset.filter;
+document.querySelectorAll("#assignmentTabs button").forEach(x=>x.classList.toggle("active",x===b));
+renderAssignments();
+};
+$("addAssignment").onclick=()=>{
+let title=prompt("Assignment title:");if(!title)return;
+let subject=prompt("Subject:",subjects()[0]?.name||"");if(subject===null)return;
+let due=prompt("Due date (YYYY-MM-DD):",today());if(due===null)return;
+data.assignments.push({id:makeId(),strand,title,subject,due,done:false});save();toast("Assignment added");
+};
+function toggleAssignment(id){let a=data.assignments.find(x=>x.id===id);if(a)a.done=!a.done;save()}
+function deleteAssignment(id){data.assignments=data.assignments.filter(a=>a.id!==id);save()}
+
+function renderModules(){
+let list=data.modules.filter(m=>m.strand===strand),done=list.filter(m=>m.done).length;
+$("moduleProgress").textContent=`${done} / ${list.length} completed`;
+$("moduleFill").style.width=(list.length?done/list.length*100:0)+"%";
+$("moduleList").innerHTML=list.map(m=>`<div class="list-item"><div><b>${esc(m.title)}</b><small>${m.done?"Completed":"Still pending"}</small></div><div><input type="checkbox" ${m.done?"checked":""} onchange="toggleModule('${m.id}',this.checked)"> <button class="btn danger small" onclick="deleteModule('${m.id}')">×</button></div></div>`).join("")||'<div class="empty">Add your first module to start tracking progress.</div>';
+}
+$("addModule").onclick=()=>{let title=prompt("Module name:");if(!title)return;data.modules.push({id:makeId(),strand,title,done:false});save()};
+function toggleModule(id,v){let m=data.modules.find(x=>x.id===id);if(m)m.done=v;save()}
+function deleteModule(id){data.modules=data.modules.filter(m=>m.id!==id);save()}
+
+function monthLabel(d){return d.toLocaleDateString(undefined,{month:"long",year:"numeric"})}
+function dateKey(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function calendarHTML(d,target){
+let first=new Date(d.getFullYear(),d.getMonth(),1),start=new Date(d.getFullYear(),d.getMonth(),1-first.getDay());
+let out=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(x=>`<span class="dow">${x}</span>`).join("");
+for(let i=0;i<42;i++){
+let day=new Date(start);day.setDate(start.getDate()+i);let key=dateKey(day);
+let cls="day"+(day.getMonth()!==d.getMonth()?" muted":"")+(key===today()?" today":"")+(key===selectedDate?" selected":"");
+out+=`<span class="${cls}" onclick="pickDate('${key}')">${day.getDate()}${data.events.some(e=>e.date===key)?" •":""}</span>`;
+}
+$(target).innerHTML=out;
+}
+function renderCalendar(){
+$("fullMonth").textContent=monthLabel(calDate);calendarHTML(calDate,"fullCalendar");
+$("selectedDateLabel").textContent=new Date(selectedDate+"T12:00:00").toDateString();
+let events=data.events.filter(e=>e.date===selectedDate);
+$("selectedEvents").innerHTML=events.map(e=>`<div class="list-item"><div><b>${esc(e.title)}</b><small>${esc(e.time||"All day")} · ${esc(e.note||"")}</small></div><button class="btn danger small" onclick="deleteEvent('${e.id}')">×</button></div>`).join("")||'<div class="empty">No events for this date ♡</div>';
+}
+function pickDate(d){selectedDate=d;renderCalendar()}
+$("calPrev").onclick=()=>{calDate.setMonth(calDate.getMonth()-1);renderCalendar()};
+$("calNext").onclick=()=>{calDate.setMonth(calDate.getMonth()+1);renderCalendar()};
+$("addEvent").onclick=()=>{
+let title=prompt("Event title:");if(!title)return;
+let date=prompt("Date (YYYY-MM-DD):",selectedDate);if(!date)return;
+let time=prompt("Time (optional):","");if(time===null)return;
+let note=prompt("Notes (optional):","");if(note===null)return;
+data.events.push({id:makeId(),title,date,time,note});selectedDate=date;save();go("calendar");
+};
+function deleteEvent(id){data.events=data.events.filter(e=>e.id!==id);save();renderCalendar()}
+
+function renderGrades(){
+let list=data.grades.filter(g=>g.strand===strand);
+$("gradeRows").innerHTML=list.map(g=>`<tr><td>${esc(g.subject)}</td><td>${esc(g.label)}</td><td>${g.score}</td><td>${g.outOf}</td><td>${Math.round(g.score/g.outOf*100)}%</td><td><button class="btn danger small" onclick="deleteGrade('${g.id}')">Delete</button></td></tr>`).join("")||'<tr><td colspan="6" class="empty">No grades recorded yet.</td></tr>';
+let avg=list.length?Math.round(list.reduce((s,g)=>s+g.score/g.outOf*100,0)/list.length):null;
+$("gradeAverage").textContent=avg===null?"—":avg+"%";
+}
+$("addGrade").onclick=()=>{
+let subject=prompt("Subject:",subjects()[0]?.name||"");if(subject===null)return;
+let label=prompt("Activity / term:");if(!label)return;
+let score=Number(prompt("Score:","")),out=Number(prompt("Out of:",""));
+if(!Number.isFinite(score)||!Number.isFinite(out)||out<=0||score<0||score>out)return toast("Enter a valid score and total");
+data.grades.push({id:makeId(),strand,subject,label,score,outOf:out});save();
+};
+function deleteGrade(id){data.grades=data.grades.filter(g=>g.id!==id);save()}
+
+function renderSchedule(){
+$("scheduleRows").innerHTML=data.schedule.filter(s=>s.strand===strand).sort((a,b)=>a.day.localeCompare(b.day)||a.time.localeCompare(b.time)).map(s=>`<tr><td>${esc(s.day)}</td><td>${esc(s.time)}</td><td>${esc(s.subject)}</td><td>${esc(s.room||"—")}</td><td><button class="btn danger small" onclick="deleteSchedule('${s.id}')">Delete</button></td></tr>`).join("")||'<tr><td colspan="5" class="empty">No classes added yet.</td></tr>';
+}
+$("addSchedule").onclick=()=>{
+let day=prompt("Day of week:","Monday");if(!day)return;
+let time=prompt("Time:","8:00 AM");if(!time)return;
+let subject=prompt("Subject:",subjects()[0]?.name||"");if(!subject)return;
+let room=prompt("Room:","");if(room===null)return;
+data.schedule.push({id:makeId(),strand,day,time,subject,room});save();
+};
+function deleteSchedule(id){data.schedule=data.schedule.filter(s=>s.id!==id);save()}
+
+function renderDashboard(){
+let ss=subjects();
+$("statSubjects").textContent=ss.length;
+$("statTasks").textContent=data.assignments.filter(a=>a.strand===strand&&!a.done).length;
+let mods=data.modules.filter(m=>m.strand===strand);
+$("statModules").textContent=(mods.length?Math.round(mods.filter(m=>m.done).length/mods.length*100):0)+"%";
+let at=data.attendance.filter(a=>a.strand===strand);
+let pct=at.length?Math.round(at.filter(a=>a.status==="Present"||a.status==="Late").length/at.length*100):0;
+$("dashPercent").textContent=pct+"%";
+$("dashAttendance").innerHTML=ss.slice(0,7).map(s=>{
+let rec=at.filter(a=>a.subject===s.name),p=rec.length?Math.round(rec.filter(a=>a.status==="Present"||a.status==="Late").length/rec.length*100):0;
+return `<div style="margin:8px 0;font-size:12px">${esc(s.name)} <b style="float:right">${p}%</b><div style="height:7px;background:#eee8f8;border-radius:10px;margin-top:4px"><div style="height:100%;width:${p}%;background:#a78bfa;border-radius:10px"></div></div></div>`;
+}).join("")||"Add subjects to get started.";
+let a=data.assignments.filter(x=>x.strand===strand&&!x.done).slice(0,3);
+$("dashAssignments").innerHTML=a.map(x=>`<div class="list-item"><div><b>${esc(x.title)}</b><small>${esc(x.subject)} · ${esc(x.due||"No due date")}</small></div><span class="tag">Upcoming</span></div>`).join("")||'<div class="empty">No active assignments ♡</div>';
+$("dashModules").innerHTML=mods.length?`${mods.filter(m=>m.done).length} of ${mods.length} modules completed`:'<div class="empty">No modules added yet.</div>';
+$("dashMonth").textContent=monthLabel(calDate);calendarHTML(calDate,"dashCalendar");
+let ev=data.events.filter(e=>e.date===today());
+$("dashEvents").innerHTML=ev.map(e=>`<div class="event">${esc(e.title)} · ${esc(e.time||"")}</div>`).join("")||"Nothing scheduled today ♡";
+}
+$("dashPrev").onclick=()=>{calDate.setMonth(calDate.getMonth()-1);renderDashboard()};
+$("dashNext").onclick=()=>{calDate.setMonth(calDate.getMonth()+1);renderDashboard()};
+
+function renderAll(){
+$("strandSelect").value=strand;
+$("greeting").textContent="Hello, "+(data.profile.name||"Student")+"! ♡";
+renderSubjects();renderAttendance();renderAssignments();renderModules();renderGrades();renderSchedule();renderDashboard();
+if($("page-calendar").classList.contains("active"))renderCalendar();
+}
+$("schoolName").value=data.settings.schoolName||"";
+$("saveSettings").onclick=()=>{data.settings.schoolName=$("schoolName").value;save();toast("Settings saved")};
+$("exportData").onclick=()=>{
+let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+let url=URL.createObjectURL(blob),a=document.createElement("a");
+a.href=url;a.download="school-hub-backup.json";a.click();URL.revokeObjectURL(url);
+};
+$("importFile").onchange=async e=>{
+let f=e.target.files[0];if(!f)return;
+try{let x=JSON.parse(await f.text());if(!x.profile||!x.subjects)throw Error("Invalid backup");data={...fresh(),...x};save();toast("Backup imported ♡")}
+catch(err){toast("That backup file is not valid")}
+e.target.value="";
+};
+$("resetData").onclick=()=>{
+if(confirm("This will permanently erase the School Hub data saved in this browser. Continue?")){
+data=fresh();strand="STEM";save();renderProfile();toast("App data reset");
+}
+};
+renderAll();
+renderProfile();
+</script>
+</body>
+</html>
