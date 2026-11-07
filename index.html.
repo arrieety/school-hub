@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#111827">
+<title>Peeps Only</title>
+<style>
+:root{--bg:#0b1020;--panel:#151d31;--panel2:#1c2740;--text:#f5f7ff;--muted:#9aa8c4;--accent:#9b8cff;--accent2:#6de0c2;--danger:#ff7b91;--line:#2a3652}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(145deg,#0b1020,#15152d);color:var(--text);font:15px system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
+.wrap{max-width:980px;margin:auto;padding:22px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.brand{font-size:27px;font-weight:850;letter-spacing:-1px}
+.brand span{color:var(--accent)}
+.muted{color:var(--muted)}
+.panel{background:rgba(21,29,49,.96);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:15px;box-shadow:0 12px 35px #0003}
+.hidden{display:none!important}
+h2{font-size:18px;margin:0 0 13px}
+h3{font-size:15px;margin:0 0 10px}
+input,button{font:inherit;border-radius:11px;padding:12px;border:1px solid var(--line)}
+input{width:100%;background:#0e1628;color:var(--text);margin:5px 0 10px;outline:none}
+input:focus{border-color:var(--accent)}
+button{background:var(--accent);color:#111327;font-weight:750;border:0;cursor:pointer}
+button.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line)}
+button.good{background:var(--accent2)}
+button.danger{background:var(--danger)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.row{display:flex;gap:9px;align-items:center}
+.row input{flex:1;min-width:0}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.tabs button{flex:1;min-width:100px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.item{padding:12px;border:1px solid var(--line);background:#10192c;border-radius:12px;margin:8px 0}
+.item .row{justify-content:space-between}
+.chatbox{height:340px;overflow:auto;background:#0e1628;border:1px solid var(--line);border-radius:13px;padding:12px}
+.bubble{max-width:82%;padding:10px 12px;border-radius:14px;background:#27334e;margin:8px 0;overflow-wrap:anywhere}
+.bubble.mine{background:#6659bd;margin-left:auto}
+.bubble small{display:block;color:#d2d7eb;font-size:11px;margin-top:4px}
+.status{font-size:12px;color:var(--accent2)}
+.notice{padding:10px 12px;border-radius:10px;background:#202b44;color:#cbd5ee;margin:10px 0;font-size:13px}
+.error{color:#ff9bab}
+.footer{font-size:12px;color:var(--muted);text-align:center;margin:20px 0}
+.section{margin-top:15px}
+@media(max-width:680px){
+.wrap{padding:13px}
+.grid{grid-template-columns:1fr}
+.top{align-items:flex-start}
+.brand{font-size:24px}
+.chatbox{height:48vh}
+.row.stack-mobile{flex-wrap:wrap}
+.row.stack-mobile input{flex-basis:100%}
+}
+</style>
+</head>
+
+<body>
+<main class="wrap">
+
+<header class="top">
+<div>
+<div class="brand">Peeps <span>Only.</span></div>
+<div class="muted">Your little corner to chat</div>
+</div>
+<div id="connection" class="status">Not connected</div>
+</header>
+
+<section id="setup" class="panel">
+<h2>Connect Peeps Only</h2>
+<p class="muted">Your Firebase connection is configured below.</p>
+<label class="muted">Firebase config</label>
+<textarea id="config" rows="7" style="width:100%;background:#0e1628;color:#f5f7ff;border:1px solid #2a3652;border-radius:11px;padding:12px"></textarea>
+<div class="row">
+<button id="connectBtn">Connect</button>
+<button id="forgetConfig" class="secondary">Clear saved config</button>
+</div>
+<div class="notice">Enable Email/Password Authentication and Cloud Firestore in Firebase before creating accounts.</div>
+<div id="setupMsg" class="muted"></div>
+</section>
+
+<section id="auth" class="panel hidden">
+<h2>Welcome to Peeps Only</h2>
+<div class="grid">
+<div>
+<h3>Create account</h3>
+<input id="newName" placeholder="Display name">
+<input id="newUser" placeholder="Username (no spaces)">
+<input id="newEmail" type="email" placeholder="Email">
+<input id="newPass" type="password" placeholder="Password (6+ characters)">
+<button id="signup" class="good">Create account</button>
+</div>
+<div>
+<h3>Log in</h3>
+<input id="loginEmail" type="email" placeholder="Email">
+<input id="loginPass" type="password" placeholder="Password">
+<button id="login">Log in</button>
+<p class="muted">Use the same account on your other phone.</p>
+</div>
+</div>
+<div id="authMsg" class="muted"></div>
+</section>
+
+<section id="app" class="hidden">
+
+<div class="panel">
+<div class="row" style="justify-content:space-between">
+<div>
+<h2 id="hello">Hi!</h2>
+<div class="muted" id="myHandle"></div>
+</div>
+<button id="logout" class="secondary">Log out</button>
+</div>
+<div class="notice">
+Offline mode: messages can wait on this device and sync when it reconnects. Your friends must also connect to receive them. Distant phones cannot exchange messages while both have no internet or network.
+</div>
+</div>
+
+<div class="grid">
+
+<div class="panel">
+<h2>Add a friend</h2>
+<div class="row">
+<input id="friendName" placeholder="Exact username">
+<button id="sendRequest">Add</button>
+</div>
+<div id="friendMsg" class="muted"></div>
+
+<div class="section">
+<h3>Friend requests</h3>
+<div id="requests" class="muted">No requests yet.</div>
+</div>
+
+<div class="section">
+<h3>Your friends</h3>
+<div id="friends" class="muted">No friends yet.</div>
+</div>
+</div>
+
+<div class="panel">
+<h2 id="chatTitle">Your messages</h2>
+<div id="chatHint" class="muted">Choose a friend to open a chat.</div>
+<div id="chatArea" class="hidden">
+<div id="messages" class="chatbox"></div>
+<div class="row" style="margin-top:9px">
+<input id="messageInput" placeholder="Write a message..." maxlength="2000">
+<button id="sendMessage">Send</button>
+</div>
+</div>
+</div>
+
+</div>
+</section>
+
+<div class="footer">Peeps Only · Independent app · Be kind and keep your account safe.</div>
+</main>
+
+<script>
+// Firebase SDK loader
+let firebaseSdkPromise=null;
+
+function loadFirebaseSdk(){
+if(window.firebase && window.firebase.auth && window.firebase.firestore){
+return Promise.resolve();
+}
+
+if(firebaseSdkPromise)return firebaseSdkPromise;
+
+const files=[
+'firebase-app-compat.js',
+'firebase-auth-compat.js',
+'firebase-firestore-compat.js'
+];
+
+firebaseSdkPromise=files.reduce((chain,file)=>
+chain.then(()=>new Promise((resolve,reject)=>{
+const tag=document.createElement('script');
+tag.src='https://www.gstatic.com/firebasejs/10.14.1/'+file;
+tag.onload=resolve;
+tag.onerror=()=>reject(new Error(
+'Could not load Firebase SDK. Check your internet connection and refresh.'
+));
+document.head.appendChild(tag);
+})),Promise.resolve()).then(()=>{
+if(!window.firebase || !window.firebase.auth || !window.firebase.firestore){
+throw new Error('Firebase SDK loaded incompletely. Refresh and try again.');
+}
+}).catch(error=>{
+firebaseSdkPromise=null;
+throw error;
+});
+
+return firebaseSdkPromise;
+}
+
+const $=id=>document.getElementById(id);
+
+let auth=null;
+let db=null;
+let currentUser=null;
+let myProfile=null;
+let activeFriend=null;
+let stopMessages=null;
+let stopRequests=null;
+let stopFriends=null;
+
+const defaultFirebaseConfig={
+"apiKey":"AIzaSyB6QBWbWwRXQ6dpvOyXQqlV_S5sjeKd4m4",
+"authDomain":"peeps-20987.firebaseapp.com",
+"projectId":"peeps-20987",
+"storageBucket":"peeps-20987.firebasestorage.app",
+"messagingSenderId":"609115927104",
+"appId":"1:609115927104:web:c720db8f4bc4931fe825a5",
+"measurementId":"G-QY384HCEL1"
+};
+
+const saved=localStorage.getItem('peepsFirebaseConfig');
+
+$('config').value=saved||JSON.stringify(defaultFirebaseConfig,null,2);
+
+function say(id,msg,isError=false){
+$(id).textContent=msg;
+$(id).className=isError?'error':'muted';
+}
+
+function esc(s){
+return String(s??'').replace(/[&<>"']/g,c=>({
+'&':'&amp;',
+'<':'&lt;',
+'>':'&gt;',
+'"':'&quot;',
+"'":'&#39;'
+}[c]));
+}
+
+function setOnline(){
+$('connection').textContent=navigator.onLine?
+'Connected to internet':
+'Offline — messages will sync later';
+}
+
+window.addEventListener('online',setOnline);
+window.addEventListener('offline',setOnline);
+setOnline();
+
+async function connect(configText){
+await loadFirebaseSdk();
+
+let cfg;
+try{
+cfg=JSON.parse(configText);
+}catch(e){
+throw new Error('That config is not valid JSON. Copy the whole Firebase config object.');
+}
+
+if(!cfg.apiKey||!cfg.projectId||!cfg.appId){
+throw new Error('The config needs apiKey, projectId, and appId.');
+}
+
+if(!firebase.apps.length){
+firebase.initializeApp(cfg);
+}
+
+auth=firebase.auth();
+db=firebase.firestore();
+
+try{
+await db.enablePersistence({synchronizeTabs:true});
+}catch(e){
+console.log('Offline persistence unavailable:',e.code||e.message);
+}
+
+$('setup').classList.add('hidden');
+$('auth').classList.remove('hidden');
+
+auth.onAuthStateChanged(async user=>{
+currentUser=user;
+if(user){
+try{
+await loadProfile();
+showApp();
+}catch(e){
+say('authMsg',e.message,true);
+}
+}else{
+showAuth();
+}
+});
+}
+
+$('connectBtn').onclick=async()=>{
+try{
+say('setupMsg','Connecting...');
+localStorage.setItem('peepsFirebaseConfig',$('config').value.trim());
+await connect($('config').value.trim());
+say('setupMsg','Connected.');
+}catch(e){
+say('setupMsg',e.message,true);
+}
+};
+
+$('forgetConfig').onclick=()=>{
+localStorage.removeItem('peepsFirebaseConfig');
+$('config').value='';
+say('setupMsg','Saved config cleared.');
+};
+
+if(saved){
+connect(saved).catch(e=>{
+$('setup').classList.remove('hidden');
+say('setupMsg',e.message,true);
+});
+}
+
+function showAuth(){
+$('auth').classList.remove('hidden');
+$('app').classList.add('hidden');
+}
+
+function showApp(){
+$('auth').classList.add('hidden');
+$('app').classList.remove('hidden');
+$('hello').textContent='Hi, '+(myProfile.displayName||myProfile.username)+'!';
+$('myHandle').textContent='@'+myProfile.username;
+listenRequests();
+listenFriends();
+}
+
+async function loadProfile(){
+const ref=db.collection('users').doc(currentUser.uid);
+const snap=await ref.get();
+
+if(!snap.exists){
+throw new Error('Account profile not found. Please sign out and create your account again.');
+}
+
+myProfile=snap.data();
+}
+
+$('signup').onclick=async()=>{
+try{
+const name=$('newName').value.trim();
+const username=$('newUser').value.trim().toLowerCase().replace(/^@/,'').replace(/\s+/g,'');
+const email=$('newEmail').value.trim();
+const password=$('newPass').value;
+
+if(!name||!username||!email||password.length<6){
+throw new Error('Fill in every field. Password must be at least 6 characters.');
+}
+
+if(!/^[a-z0-9_.]{3,20}$/.test(username)){
+throw new Error('Username must be 3–20 characters: letters, numbers, dots, or underscores.');
+}
+
+const taken=await db.collection('users').where('username','==',username).limit(1).get();
+
+if(!taken.empty){
+throw new Error('That username is already taken.');
+}
+
+const cred=await auth.createUserWithEmailAndPassword(email,password);
+
+myProfile={
+uid:cred.user.uid,
+username,
+displayName:name,
+createdAt:firebase.firestore.FieldValue.serverTimestamp()
+};
+
+await db.collection('users').doc(cred.user.uid).set(myProfile);
+
+say('authMsg','Account created!');
+}catch(e){
+say('authMsg',e.message,true);
+}
+};
+
+$('login').onclick=async()=>{
+try{
+await auth.signInWithEmailAndPassword(
+$('loginEmail').value.trim(),
+$('loginPass').value
+);
+say('authMsg','Logged in.');
+}catch(e){
+say('authMsg',e.message,true);
+}
+};
+
+$('logout').onclick=()=>auth.signOut();
+
+$('sendRequest').onclick=async()=>{
+try{
+const username=$('friendName').value.trim().toLowerCase().replace(/^@/,'');
+
+if(!username)throw new Error('Enter a username.');
+
+const q=await db.collection('users')
+.where('username','==',username)
+.limit(1).get();
+
+if(q.empty)throw new Error('No account found with that username.');
+
+const target=q.docs[0].data();
+
+if(target.uid===currentUser.uid){
+throw new Error('You cannot add yourself.');
+}
+
+const existing=await db.collection('friendRequests')
+.where('fromUid','==',currentUser.uid)
+.where('toUid','==',target.uid)
+.where('status','==','pending').get();
+
+if(!existing.empty)throw new Error('Request already sent.');
+
+await db.collection('friendRequests').add({
+fromUid:currentUser.uid,
+toUid:target.uid,
+fromName:myProfile.displayName,
+fromUsername:myProfile.username,
+toName:target.displayName,
+toUsername:target.username,
+status:'pending',
+createdAt:firebase.firestore.FieldValue.serverTimestamp()
+});
+
+$('friendName').value='';
+say('friendMsg','Friend request sent!');
+}catch(e){
+say('friendMsg',e.message,true);
+}
+};
+
+function listenRequests(){
+if(stopRequests)stopRequests();
+
+stopRequests=db.collection('friendRequests')
+.where('toUid','==',currentUser.uid)
+.where('status','==','pending')
+.onSnapshot(s=>{
+const el=$('requests');
+el.innerHTML='';
+
+if(s.empty){
+el.textContent='No pending requests.';
+return;
+}
+
+s.forEach(doc=>{
+const r=doc.data();
+const d=document.createElement('div');
+d.className='item';
+
+d.innerHTML=`
+<div><b>${esc(r.fromName)}</b>
+<span class="muted">@${esc(r.fromUsername)}</span></div>
+<div class="row" style="margin-top:8px">
+<button class="good">Accept</button>
+<button class="secondary">Decline</button>
+</div>`;
+
+const [yes,no]=d.querySelectorAll('button');
+
+yes.onclick=()=>acceptRequest(doc.id,r);
+no.onclick=()=>doc.ref.update({status:'declined'});
+
+el.appendChild(d);
+});
+},e=>say('friendMsg',e.message,true));
+}
+
+async function acceptRequest(id,r){
+try{
+const ids=[currentUser.uid,r.fromUid].sort();
+const friendshipId=ids.join('_');
+const batch=db.batch();
+
+batch.set(db.collection('friendships').doc(friendshipId),{
+participants:ids,
+createdAt:firebase.firestore.FieldValue.serverTimestamp()
+});
+
+batch.update(db.collection('friendRequests').doc(id),{
+status:'accepted'
+});
+
+await batch.commit();
+}catch(e){
+say('friendMsg',e.message,true);
+}
+}
+
+function listenFriends(){
+if(stopFriends)stopFriends();
+
+stopFriends=db.collection('friendships')
+.where('participants','array-contains',currentUser.uid)
+.onSnapshot(async s=>{
+const el=$('friends');
+el.innerHTML='';
+
+if(s.empty){
+el.textContent='No friends yet. Add someone by username.';
+return;
+}
+
+for(const doc of s.docs){
+const id=doc.data().participants.find(x=>x!==currentUser.uid);
+
+try{
+const u=await db.collection('users').doc(id).get();
+
+if(!u.exists)continue;
+
+const p=u.data();
+const d=document.createElement('div');
+d.className='item row';
+
+d.innerHTML=`
+<div><b>${esc(p.displayName)}</b>
+<div class="muted">@${esc(p.username)}</div></div>
+<button>Message</button>`;
+
+d.querySelector('button').onclick=()=>openChat(p);
+el.appendChild(d);
+}catch(e){
+console.log(e);
+}
+}
+},e=>say('friendMsg',e.message,true));
+}
+
+function openChat(friend){
+activeFriend=friend;
+
+$('chatTitle').textContent='Chat with '+friend.displayName;
+$('chatHint').classList.add('hidden');
+$('chatArea').classList.remove('hidden');
+
+if(stopMessages)stopMessages();
+
+const chatId=[currentUser.uid,friend.uid].sort().join('_');
+
+stopMessages=db.collection('chats')
+.doc(chatId)
+.collection('messages')
+.orderBy('createdAt')
+.limit(100)
+.onSnapshot(s=>{
+const box=$('messages');
+box.innerHTML='';
+
+s.forEach(doc=>{
+const m=doc.data();
+const d=document.createElement('div');
+
+d.className='bubble'+(
+m.senderUid===currentUser.uid?' mine':''
+);
+
+const time=m.createdAt?.toDate?
+m.createdAt.toDate().toLocaleString():
+'Sending…';
+
+d.innerHTML=`
+${esc(m.text)}
+<small>${m.senderUid===currentUser.uid?'You':esc(friend.displayName)} · ${esc(time)}</small>`;
+
+box.appendChild(d);
+});
+
+box.scrollTop=box.scrollHeight;
+},e=>say('friendMsg',e.message,true));
+}
+
+async function sendMessage(){
+try{
+if(!activeFriend)return;
+
+const text=$('messageInput').value.trim();
+if(!text)return;
+
+const chatId=[currentUser.uid,activeFriend.uid].sort().join('_');
+const chatRef=db.collection('chats').doc(chatId);
+
+await chatRef.set({
+participants:[currentUser.uid,activeFriend.uid].sort(),
+updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+},{merge:true});
+
+await chatRef.collection('messages').add({
+senderUid:currentUser.uid,
+text,
+createdAt:firebase.firestore.FieldValue.serverTimestamp()
+});
+
+$('messageInput').value='';
+}catch(e){
+say('friendMsg',e.message,true);
+}
+}
+
+$('sendMessage').onclick=sendMessage;
+
+$('messageInput').addEventListener('keydown',e=>{
+if(e.key==='Enter')sendMessage();
+});
+</script>
+</body>
+</html>
